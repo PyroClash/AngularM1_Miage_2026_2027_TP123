@@ -1,9 +1,36 @@
 <section class="card">
   <h1>Créer un compte</h1>
   <form [formGroup]="form" (ngSubmit)="submit()">
-    <label>Nom<input formControlName="name" /></label>
-    <label>Email<input type="email" formControlName="email" /></label>
-    <label>Mot de passe<input type="password" formControlName="password" /></label>
+    <label>Nom<input formControlName="name" aria-describedby="name-error" /></label>
+    <div id="name-error" aria-live="polite">
+      @if (form.controls.name.touched) {
+        @if (form.controls.name.hasError('required')) {
+          <p class="error">Le nom est obligatoire.</p>
+        } @else if (form.controls.name.hasError('minlength')) {
+          <p class="error">Le nom doit contenir au moins 2 caractères.</p>
+        }
+      }
+    </div>
+    <label>Email<input type="email" formControlName="email" aria-describedby="email-error" /></label>
+    <div id="email-error" aria-live="polite">
+      @if (form.controls.email.touched) {
+        @if (form.controls.email.hasError('required')) {
+          <p class="error">L’adresse email est obligatoire.</p>
+        } @else if (form.controls.email.hasError('email')) {
+          <p class="error">Saisissez une adresse email valide.</p>
+        }
+      }
+    </div>
+    <label>Mot de passe<input type="password" formControlName="password" aria-describedby="password-error" /></label>
+    <div id="password-error" aria-live="polite">
+      @if (form.controls.password.touched) {
+        @if (form.controls.password.hasError('required')) {
+          <p class="error">Le mot de passe est obligatoire.</p>
+        } @else if (form.controls.password.hasError('minlength')) {
+          <p class="error">Le mot de passe doit contenir au moins 8 caractères.</p>
+        }
+      }
+    </div>
     <button type="submit">Créer mon compte</button>
   </form>
   @if (error()) {
