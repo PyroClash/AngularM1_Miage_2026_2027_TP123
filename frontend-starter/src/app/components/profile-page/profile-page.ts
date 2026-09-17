@@ -10,8 +10,9 @@ import { AuthService } from '../../shared/services/auth.service';
 export class ProfilePageComponent implements OnInit {
   readonly auth = inject(AuthService);
   readonly error = signal('');
+  readonly success = signal('');
   readonly form = new FormGroup({
-    name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
   });
 
   ngOnInit(): void {
@@ -20,6 +21,7 @@ export class ProfilePageComponent implements OnInit {
 
   load(): void {
     this.error.set('');
+    this.success.set('');
     this.auth.profile().subscribe({
       next: (user) => {
         console.debug('[ProfilePage] Profil chargé', user.id);
@@ -33,9 +35,24 @@ export class ProfilePageComponent implements OnInit {
   }
 
   save(): void {
+    this.error.set('');
+    this.success.set('');
+    this.form.controls.name.setValue(this.form.controls.name.value.trim());
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.auth.update(this.form.getRawValue().name).subscribe({
-      next: (user) => console.debug('[ProfilePage] Profil enregistré', user.id),
-      error: (error) => console.error('[ProfilePage] Enregistrement impossible', error),
+      next: (user) => {
+        this.form.setValue({ name: user.name });
+        this.success.set('Votre nom a été mis à jour.');
+      },
+      error: () => {
+        console.error('[ProfilePage] Enregistrement impossible');
+        this.error.set('Impossible de modifier le nom. Réessayez.');
+      },
     });
   }
 }

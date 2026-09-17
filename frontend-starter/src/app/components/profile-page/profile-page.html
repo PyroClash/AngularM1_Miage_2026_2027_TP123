@@ -4,13 +4,25 @@
   @if (error()) {
     <p class="error" role="alert">{{ error() }}</p>
   }
+  @if (success()) {
+    <p role="status">{{ success() }}</p>
+  }
   @if (auth.currentUser(); as user) {
     <p>
       <b>{{ user.name }}</b><br />{{ user.email }}<br />
       Membre depuis {{ user.createdAt.slice(0, 10) }}
     </p>
     <form [formGroup]="form" (ngSubmit)="save()">
-      <label>Nouveau nom<input formControlName="name" /></label>
+      <label>Nouveau nom<input formControlName="name" aria-describedby="name-error" /></label>
+      <div id="name-error" aria-live="polite">
+        @if (form.controls.name.touched) {
+          @if (form.controls.name.hasError('required')) {
+            <p class="error">Le nom est obligatoire.</p>
+          } @else if (form.controls.name.hasError('minlength')) {
+            <p class="error">Le nom doit contenir au moins 2 caractères.</p>
+          }
+        }
+      </div>
       <button type="submit">Enregistrer</button>
     </form>
   }
