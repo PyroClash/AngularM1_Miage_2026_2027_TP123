@@ -1,8 +1,22 @@
 <section class="card">
   <h1>Connexion</h1>
   <form [formGroup]="form" (ngSubmit)="submit()">
-    <label>Email<input type="email" formControlName="email" /></label>
-    <label>Mot de passe<input type="password" formControlName="password" /></label>
+    <label>Email<input type="email" formControlName="email" aria-describedby="email-error" /></label>
+    <div id="email-error" aria-live="polite">
+      @if (form.controls.email.touched) {
+        @if (form.controls.email.hasError('required')) {
+          <p class="error">L’adresse email est obligatoire.</p>
+        } @else if (form.controls.email.hasError('email')) {
+          <p class="error">Saisissez une adresse email valide.</p>
+        }
+      }
+    </div>
+    <label>Mot de passe<input type="password" formControlName="password" aria-describedby="password-error" /></label>
+    <div id="password-error" aria-live="polite">
+      @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+        <p class="error">Le mot de passe est obligatoire.</p>
+      }
+    </div>
     <button type="submit">Se connecter</button>
   </form>
   @if (error()) {
