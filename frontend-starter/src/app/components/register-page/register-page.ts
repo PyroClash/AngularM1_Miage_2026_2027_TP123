@@ -36,7 +36,7 @@ export class RegisterPageComponent {
         void this.router.navigateByUrl('/profile');
       },
       error: (error: { error?: { message?: string } }) => {
-        console.error('[RegisterPage] Échec de l’inscription', error);
+        console.error('[RegisterPage] Échec de l’inscription');
         this.error.set(error.error?.message ?? 'Erreur d’inscription');
       },
     });

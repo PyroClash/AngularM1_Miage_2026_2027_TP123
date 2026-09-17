@@ -37,7 +37,7 @@ export class LoginPageComponent {
         void this.router.navigateByUrl('/tracks');
       },
       error: (error: { error?: { message?: string } }) => {
-        console.error('[LoginPage] Échec de connexion', error);
+        console.error('[LoginPage] Échec de connexion');
         this.error.set(error.error?.message ?? 'Erreur de connexion');
       },
     });
