@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Mission 0 — Flux d’un clic sur « Se connecter »",
+    "output": "MISSION0_FLUX_CONNEXION.html",
+    "viewBox": [1480, 780],
+    "column_fit": "spread",
+    "quality_profile": "showcase"
+  },
+  "participants": [
+    {
+      "id": "utilisateur",
+      "type": "external",
+      "label": "Utilisateur"
+    },
+    {
+      "id": "loginPage",
+      "type": "frontend",
+      "label": "LoginPageComponent"
+    },
+    {
+      "id": "authService",
+      "type": "frontend",
+      "label": "AuthService"
+    },
+    {
+      "id": "httpPipeline",
+      "type": "security",
+      "label": "Pipeline HTTP"
+    },
+    {
+      "id": "expressApi",
+      "type": "backend",
+      "label": "API Express"
+    },
+    {
+      "id": "userModel",
+      "type": "backend",
+      "label": "Modèle User"
+    },
+    {
+      "id": "mongoDb",
+      "type": "database",
+      "label": "MongoDB"
+    },
+    {
+      "id": "browserState",
+      "type": "frontend",
+      "label": "État navigateur"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 275,
+      "label": "Soumission Angular"
+    },
+    {
+      "from": 280,
+      "to": 455,
+      "label": "Authentification côté serveur"
+    },
+    {
+      "from": 460,
+      "to": 650,
+      "label": "Réponse et session locale"
+    }
+  ],
+  "messages": [
+    {
+      "id": "clickLogin",
+      "from": "utilisateur",
+      "to": "loginPage",
+      "y": 165,
+      "label": "clic « Se connecter » → submit()",
+      "variant": "emphasis",
+      "note": "Le formulaire fournit email et mot de passe."
+    },
+    {
+      "id": "callLogin",
+      "from": "loginPage",
+      "to": "authService",
+      "y": 205,
+      "label": "login(email, password)",
+      "variant": "default"
+    },
+    {
+      "id": "postLogin",
+      "from": "authService",
+      "to": "httpPipeline",
+      "y": 245,
+      "label": "POST /api/auth/login {email,password}",
+      "variant": "emphasis"
+    },
+    {
+      "id": "publicRequest",
+      "from": "httpPipeline",
+      "to": "expressApi",
+      "y": 290,
+      "label": "requête publique via proxy → localhost:3000",
+      "variant": "security",
+      "note": "Au premier login, aucun JWT n’existe : l’intercepteur transmet la requête sans Authorization."
+    },
+    {
+      "id": "findUser",
+      "from": "expressApi",
+      "to": "userModel",
+      "y": 335,
+      "label": "findOne(email) + select passwordHash",
+      "variant": "default"
+    },
+    {
+      "id": "queryMongo",
+      "from": "userModel",
+      "to": "mongoDb",
+      "y": 375,
+      "label": "recherche du document utilisateur",
+      "variant": "default"
+    },
+    {
+      "id": "userDocument",
+      "from": "mongoDb",
+      "to": "userModel",
+      "y": 410,
+      "label": "document + passwordHash",
+      "variant": "return"
+    },
+    {
+      "id": "passwordCheck",
+      "from": "userModel",
+      "to": "expressApi",
+      "y": 445,
+      "label": "verifyPassword() → résultat bcrypt",
+      "variant": "return",
+      "note": "Si les identifiants sont faux, l’API répond 401."
+    },
+    {
+      "id": "loginResponse",
+      "from": "expressApi",
+      "to": "httpPipeline",
+      "y": 490,
+      "label": "200 {token,user}",
+      "variant": "return",
+      "note": "Le JWT signé expire après 2 h ; le hash du mot de passe n’est jamais renvoyé."
+    },
+    {
+      "id": "authResponse",
+      "from": "httpPipeline",
+      "to": "authService",
+      "y": 530,
+      "label": "AuthResponse",
+      "variant": "return"
+    },
+    {
+      "id": "storeAuth",
+      "from": "authService",
+      "to": "browserState",
+      "y": 570,
+      "label": "tap: stocker token + currentUser",
+      "variant": "security",
+      "note": "Le token va dans gpc_token et dans le Signal token ; l’utilisateur va dans currentUser."
+    },
+    {
+      "id": "notifySuccess",
+      "from": "authService",
+      "to": "loginPage",
+      "y": 610,
+      "label": "Observable next()",
+      "variant": "return"
+    },
+    {
+      "id": "navigateTracks",
+      "from": "loginPage",
+      "to": "browserState",
+      "y": 640,
+      "label": "Router.navigateByUrl('/tracks')",
+      "variant": "emphasis",
+      "note": "authGuard autorise /tracks car token() n’est plus nul."
+    }
+  ],
+  "activations": [
+    {
+      "participant": "loginPage",
+      "from": 160,
+      "to": 665,
+      "type": "frontend"
+    },
+    {
+      "participant": "authService",
+      "from": 200,
+      "to": 625,
+      "type": "frontend"
+    },
+    {
+      "participant": "httpPipeline",
+      "from": 240,
+      "to": 545,
+      "type": "security"
+    },
+    {
+      "participant": "expressApi",
+      "from": 285,
+      "to": 500,
+      "type": "backend"
+    },
+    {
+      "participant": "userModel",
+      "from": 330,
+      "to": 455,
+      "type": "backend"
+    },
+    {
+      "participant": "mongoDb",
+      "from": 370,
+      "to": 420,
+      "type": "database"
+    },
+    {
+      "participant": "browserState",
+      "from": 565,
+      "to": 665,
+      "type": "frontend"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Routes publiques — sans JWT",
+      "items": [
+        "GET /api/health",
+        "POST /api/auth/register",
+        "POST /api/auth/login"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Routes protégées — Bearer JWT requis",
+      "items": [
+        "GET et PUT /api/users/me",
+        "GET et POST /api/tracks",
+        "GET /api/tracks/:id/audio et DELETE /api/tracks/:id"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Ajout automatique du JWT",
+      "items": [
+        "authInterceptor lit AuthService.token()",
+        "Si présent, clone la requête avec Authorization: Bearer <token>",
+        "Le middleware Express auth vérifie signature et expiration"
+      ]
+    }
+  ]
+}
