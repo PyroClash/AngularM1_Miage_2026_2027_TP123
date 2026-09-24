@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgOptimizedImage } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -26,7 +26,7 @@ function frenchPaginatorIntl(): MatPaginatorIntl {
 }
 
 @Component({
-  imports: [DatePipe, ReactiveFormsModule, MatPaginatorModule],
+  imports: [DatePipe, NgOptimizedImage, ReactiveFormsModule, MatPaginatorModule],
   providers: [{ provide: MatPaginatorIntl, useFactory: frenchPaginatorIntl }],
   templateUrl: './tracks-page.html',
   styleUrl: './tracks-page.css',
@@ -35,6 +35,7 @@ export class TracksPageComponent {
   private readonly service = inject(TrackService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly audioInput = viewChild<ElementRef<HTMLInputElement>>('audioInput');
+  private readonly player = viewChild<ElementRef<HTMLAudioElement>>('player');
   private listRequest = 0;
   private audioRequest = 0;
 
@@ -51,6 +52,10 @@ export class TracksPageComponent {
   readonly audioError = signal('');
   readonly playingTrack = signal<Track | null>(null);
   readonly audioUrl = signal('');
+  readonly isPlaying = signal(false);
+  readonly currentTime = signal(0);
+  readonly duration = signal(0);
+  readonly volume = signal(0.8);
   readonly title = new FormControl('', { nonNullable: true });
   file?: File;
 
@@ -140,6 +145,10 @@ export class TracksPageComponent {
   }
 
   play(track: Track): void {
+    if (this.playingTrack()?.id === track.id && this.audioUrl()) {
+      this.togglePlayback();
+      return;
+    }
     const request = ++this.audioRequest;
     this.audioLoading.set(true);
     this.audioError.set('');
@@ -147,6 +156,9 @@ export class TracksPageComponent {
       next: (blob) => {
         if (request !== this.audioRequest) return;
         const previousUrl = this.audioUrl();
+        this.isPlaying.set(false);
+        this.currentTime.set(0);
+        this.duration.set(0);
         this.audioUrl.set(URL.createObjectURL(blob));
         this.playingTrack.set(track);
         this.audioLoading.set(false);
@@ -159,6 +171,42 @@ export class TracksPageComponent {
         this.audioLoading.set(false);
       },
     });
+  }
+
+  togglePlayback(): void {
+    const audio = this.player()?.nativeElement;
+    if (!audio || !this.audioUrl()) return;
+    if (audio.paused) {
+      this.audioError.set('');
+      void audio.play().catch(() => this.audioError.set('Lecture impossible. Réessayez avec le bouton de lecture.'));
+    } else {
+      audio.pause();
+    }
+  }
+
+  seek(event: Event): void {
+    const audio = this.player()?.nativeElement;
+    if (audio && this.duration() > 0) {
+      audio.currentTime = Number((event.target as HTMLInputElement).value);
+      this.currentTime.set(audio.currentTime);
+    }
+  }
+
+  setVolume(event: Event): void {
+    this.volume.set(Number((event.target as HTMLInputElement).value));
+  }
+
+  syncTime(audio: HTMLAudioElement): void {
+    this.currentTime.set(audio.currentTime);
+    this.duration.set(Number.isFinite(audio.duration) ? audio.duration : 0);
+  }
+
+  formatTime(seconds: number): string {
+    return `${Math.floor(seconds / 60)}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
+  }
+
+  formatType(track: Track): string {
+    return track.originalName.split('.').pop()?.toUpperCase() || track.mimeType;
   }
 
   formatSize(bytes: number): string {
