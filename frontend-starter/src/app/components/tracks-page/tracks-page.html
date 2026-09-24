@@ -44,11 +44,16 @@
             @if (!loadError()) { <p>Aucune piste pour le moment.</p> }
           }
         </div>
-        <nav class="pager" aria-label="Pagination des pistes">
-          <button type="button" (click)="go(page() - 1)" [disabled]="page() <= 1">Précédent</button>
-          <span>Page {{ page() }} sur {{ pages() }}</span>
-          <button type="button" (click)="go(page() + 1)" [disabled]="page() >= pages()">Suivant</button>
-        </nav>
+        <mat-paginator
+          class="paginator"
+          aria-label="Pagination des pistes"
+          [length]="total()"
+          [pageSize]="5"
+          [pageIndex]="page() - 1"
+          [hidePageSize]="true"
+          [disabled]="loading()"
+          (page)="go($event.pageIndex + 1)"
+        />
       }
       @if (audioLoading()) { <p role="status">Chargement du morceau…</p> }
       @if (audioError()) { <p class="error" role="alert">{{ audioError() }}</p> }

@@ -13,7 +13,12 @@ form button { justify-self: start; }
 .track p { margin: 0 0 0.35rem; }
 .track small { color: #425c53; }
 .track button { flex: none; }
-.pager { flex-wrap: wrap; }
+.paginator {
+  margin-top: 1rem;
+  --mat-paginator-container-background-color: transparent;
+  --mat-paginator-container-text-color: #17312a;
+  --mat-paginator-enabled-icon-color: #1d755e;
+}
 .player { padding-top: 0.5rem; border-top: 1px solid #d8e6e0; }
 .player p { margin-bottom: 0.5rem; }
 button:focus-visible, input:focus-visible, audio:focus-visible { outline: 3px solid #e2a832; outline-offset: 2px; }

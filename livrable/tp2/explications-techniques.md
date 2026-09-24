@@ -2,7 +2,7 @@
 
 ## Pagination serveur
 
-Dans `src/app/components/tracks-page/tracks-page.ts`, le composant conserve `tracks`, `page`, `pages`, `loading` et `loadError` dans des Signals. `go(page)` change le numéro de page, puis appelle `load()`. Cette méthode appelle `TrackService.list(this.page(), 5)`. Dans `src/app/shared/services/track.service.ts`, `HttpClient` transmet les deux paramètres à `GET /api/tracks`.
+Dans `src/app/components/tracks-page/tracks-page.ts`, le composant conserve `tracks`, `page`, `pages`, `total`, `loading` et `loadError` dans des Signals. Le `MatPaginator` d'Angular Material affiche le total et émet un événement `page`. Son index commence à 0 ; `go($event.pageIndex + 1)` le convertit en numéro de page de l'API, qui commence à 1. `go(page)` appelle ensuite `load()`, puis `TrackService.list(this.page(), 5)`. Dans `src/app/shared/services/track.service.ts`, `HttpClient` transmet les deux paramètres à `GET /api/tracks`.
 
 Le backend applique `skip((page - 1) * limit)` et `limit(limit)` dans `backend/src/app.js`. Angular reçoit uniquement les métadonnées de la page demandée et ne découpe pas localement la liste complète.
 

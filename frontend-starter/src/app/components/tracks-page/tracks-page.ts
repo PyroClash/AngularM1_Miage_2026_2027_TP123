@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { Track } from '../../shared/models/track.model';
 import { TrackService } from '../../shared/services/track.service';
 
@@ -11,8 +12,22 @@ const AUDIO_TYPES = new Set([
   'audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/mp4', 'audio/x-m4a',
 ]);
 
+function frenchPaginatorIntl(): MatPaginatorIntl {
+  const intl = new MatPaginatorIntl();
+  intl.nextPageLabel = 'Page suivante';
+  intl.previousPageLabel = 'Page précédente';
+  intl.getRangeLabel = (page, pageSize, length) => {
+    if (length === 0) return '0 sur 0';
+    const start = page * pageSize + 1;
+    const end = Math.min(start + pageSize - 1, length);
+    return `${start}–${end} sur ${length}`;
+  };
+  return intl;
+}
+
 @Component({
-  imports: [DatePipe, ReactiveFormsModule],
+  imports: [DatePipe, ReactiveFormsModule, MatPaginatorModule],
+  providers: [{ provide: MatPaginatorIntl, useFactory: frenchPaginatorIntl }],
   templateUrl: './tracks-page.html',
   styleUrl: './tracks-page.css',
 })
@@ -26,6 +41,7 @@ export class TracksPageComponent {
   readonly tracks = signal<Track[]>([]);
   readonly page = signal(1);
   readonly pages = signal(1);
+  readonly total = signal(0);
   readonly loading = signal(false);
   readonly loadError = signal('');
   readonly uploading = signal(false);
@@ -77,6 +93,7 @@ export class TracksPageComponent {
         this.tracks.set(response.items);
         this.page.set(response.page);
         this.pages.set(response.pages);
+        this.total.set(response.total);
         this.loading.set(false);
       },
       error: (error) => {
