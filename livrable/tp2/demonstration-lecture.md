@@ -1,10 +1,10 @@
 # Démonstration de lecture authentifiée
 
-Vérification observée le 24 septembre 2026 dans le navigateur sur `http://localhost:4200` :
+## Vérification dans Chrome — 2 octobre 2026
 
-1. Le formulaire de connexion du compte de démonstration a ouvert `/tracks`.
-2. La bibliothèque a affiché deux cards, « SONG 2 » et « SONG 1 ».
-3. Un clic sur « Lire » pour « SONG 2 » a fait apparaître « Lecture : SONG 2 » et le lecteur audio. La lecture a progressé dans le lecteur.
-4. Une requête HTTP authentifiée vers `GET /api/tracks/:id/audio` pour cette piste a répondu `200`, avec `Content-Type: audio/mpeg` et `Content-Length: 6405141`.
+1. Après connexion, la bibliothèque a affiché cinq pistes sur neuf.
+2. Un clic sur « Lire pagination-06.mp3 » a déclenché `GET /api/tracks/6abf6b264f492e6b84e72d8c/audio` avec le header `Authorization: Bearer …`.
+3. Le backend a répondu `200`, avec `Content-Type: audio/mpeg` et `Content-Length: 24540`.
+4. Le lecteur a utilisé une URL `blob:` et a affiché « En lecture » avec le titre du morceau. Le temps de lecture a progressé ; la durée détectée était de 3 secondes.
 
-Le frontend récupère le fichier avec `HttpClient`. L'intercepteur ajoute le JWT à cette requête ; le service reçoit un `Blob`, puis le composant crée une `ObjectURL` pour le lecteur.
+![Lecture de pagination-06.mp3 dans Chrome](captures/lecture-audio.png)

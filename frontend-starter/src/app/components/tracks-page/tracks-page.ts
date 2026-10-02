@@ -47,6 +47,7 @@ export class TracksPageComponent {
   readonly loadError = signal('');
   readonly uploading = signal(false);
   readonly uploadError = signal('');
+  readonly fileValidationError = signal('');
   readonly uploadSuccess = signal('');
   readonly audioLoading = signal(false);
   readonly audioError = signal('');
@@ -69,7 +70,9 @@ export class TracksPageComponent {
 
   choose(event: Event): void {
     this.file = (event.target as HTMLInputElement).files?.[0];
-    this.uploadError.set(this.validateFile(this.file));
+    const error = this.validateFile(this.file);
+    this.fileValidationError.set(error);
+    this.uploadError.set(error);
     this.uploadSuccess.set('');
   }
 
@@ -119,6 +122,7 @@ export class TracksPageComponent {
   upload(): void {
     if (this.uploading()) return;
     const validationError = this.validateFile(this.file);
+    this.fileValidationError.set(validationError);
     this.uploadError.set(validationError);
     this.uploadSuccess.set('');
     if (validationError || !this.file) return;

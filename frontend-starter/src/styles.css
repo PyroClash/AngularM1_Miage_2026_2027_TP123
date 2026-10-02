@@ -3,7 +3,7 @@
 @font-face { font-family: Barlow; src: url('/fonts/BarlowCondensed-SemiBold.ttf') format('truetype'); font-weight: 600 800; font-display: swap; }
 :root { color-scheme: dark; --ink: #121014; --paper: #eee9e2; --accent: #ba8cd8; --muted: #bdb5c4; --line: #49404f; --surface: #1d1922; font-family: Barlow, sans-serif; color: var(--paper); background: var(--ink); font-size: 18px; }
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 1024px; }
+body { margin: 0; min-width: 320px; }
 ::selection { background: var(--accent); color: var(--ink); }
 * { scrollbar-color: #8050aa var(--ink); scrollbar-width: thin; }
 h1, h2, h3, p { margin-top: 0; }

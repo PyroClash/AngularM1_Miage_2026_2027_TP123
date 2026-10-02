@@ -14,11 +14,13 @@ Le backend applique `skip((page - 1) * limit)` et `limit(limit)` dans `backend/s
 4. Dans `backend/src/app.js`, le middleware `upload.single("audio")` et le `fileFilter` de Multer vérifient le fichier ; `limits.fileSize` impose 25 Mo. La route lit `req.body.title`.
 5. En cas de succès, le composant affiche un message, vide le titre et le sélecteur de fichier, revient à la page 1 et recharge la liste. Pendant la requête, `uploading` désactive le bouton et bloque une deuxième soumission.
 
+Le message affiché (`uploadError`) est séparé de l’erreur de validation du fichier (`fileValidationError`). Le bouton reste désactivé pendant l’envoi ou si le fichier est invalide. Après une erreur serveur, un fichier valide peut être envoyé à nouveau sans être sélectionné une deuxième fois.
+
 La validation frontend améliore l'expérience en signalant l'erreur avant le transfert. Elle ne protège pas le serveur à elle seule : un autre client HTTP peut appeler l'API sans passer par Angular. La validation backend reste donc obligatoire.
 
 ## Lecture : de l'API au lecteur
 
-Dans `src/app/shared/services/track.service.ts`, `audio(id)` fait un `GET /api/tracks/:id/audio` avec `responseType: 'blob'`. Dans `src/app/components/tracks-page/tracks-page.ts`, `play(track)` reçoit ce `Blob`, crée une URL locale avec `URL.createObjectURL(blob)`, puis renseigne `audioUrl`. Le template lie cette URL à `<audio [src]="audioUrl()" controls>`.
+Dans `src/app/shared/services/track.service.ts`, `audio(id)` fait un `GET /api/tracks/:id/audio` avec `responseType: 'blob'`. Dans `src/app/components/tracks-page/tracks-page.ts`, `play(track)` reçoit ce `Blob`, crée une URL locale avec `URL.createObjectURL(blob)`, puis renseigne `audioUrl`. Le template lie cette URL à `<audio [src]="audioUrl()" autoplay>`. Les boutons de lecture et de pause, la position de lecture et le volume sont contrôlés par le composant.
 
 Le code révoque l'ancienne URL lorsqu'une nouvelle piste est chargée, puis révoque la dernière URL à la destruction du composant. Cela libère la référence aux données du `Blob` qui n'est plus nécessaire. L'interface affiche le titre du morceau courant et les erreurs de chargement ou de décodage.
 

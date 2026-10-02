@@ -14,25 +14,26 @@
           <mat-paginator class="paginator" aria-label="Pagination des pistes" [length]="total()" [pageSize]="5" [pageIndex]="page() - 1" [hidePageSize]="true" [disabled]="loading()" (page)="go($event.pageIndex + 1)" />
         </div>
       </div>
-      <div class="table-scroll" [attr.aria-busy]="loading()">
-        <table>
-          <thead><tr><th scope="col">#</th><th scope="col">Titre</th><th scope="col">Nom de fichier</th><th scope="col">Format</th><th scope="col">Taille</th><th scope="col">Date d’ajout</th><th scope="col" class="play-column">Lecture</th></tr></thead>
-          <tbody>
-            @for (track of tracks(); track track.id; let i = $index) {
-              <tr [class.selected]="playingTrack()?.id === track.id">
-                <td class="track-number">{{ ((page() - 1) * 5 + i + 1).toString().padStart(2, '0') }}</td>
-                <th scope="row"><span class="track-title" [title]="track.title">{{ track.title }}</span></th>
-                <td><span class="filename" [title]="track.originalName">{{ track.originalName }}</span></td>
-                <td>{{ formatType(track) }}</td><td class="numeric">{{ formatSize(track.size) }}</td><td class="numeric">{{ track.createdAt | date:'dd/MM/yyyy' }}</td>
-                <td class="play-column"><button type="button" class="play-button" [class.primary]="playingTrack()?.id === track.id" (click)="play(track)" [disabled]="audioLoading()" [attr.aria-label]="(playingTrack()?.id === track.id && isPlaying() ? 'Mettre en pause ' : 'Lire ') + track.title">
-                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">@if (playingTrack()?.id === track.id && isPlaying()) {<path d="M5 3h5v18H5zm9 0h5v18h-5z"/>} @else {<path d="m6 3 16 9-16 9z"/>}</svg>
-                </button></td>
-              </tr>
-            } @empty {
-              <tr><td colspan="7" class="empty-state">@if (loading()) {<p role="status">Chargement des pistes…</p>} @else if (!loadError()) {<h2>À vous de jouer.</h2><p>Importez votre première piste pour commencer la session.</p>}</td></tr>
-            }
-          </tbody>
-        </table>
+      <div class="track-grid" [attr.aria-busy]="loading()">
+        @for (track of tracks(); track track.id; let i = $index) {
+          <article class="track-card" [class.selected]="playingTrack()?.id === track.id" [attr.aria-labelledby]="'track-' + track.id">
+            <div class="track-heading">
+              <span class="track-number" aria-hidden="true">{{ ((page() - 1) * 5 + i + 1).toString().padStart(2, '0') }}</span>
+              <h2 class="track-title" [id]="'track-' + track.id">{{ track.title }}</h2>
+              <button type="button" class="play-button" [class.primary]="playingTrack()?.id === track.id" (click)="play(track)" [disabled]="audioLoading()" [attr.aria-label]="(playingTrack()?.id === track.id && isPlaying() ? 'Mettre en pause ' : 'Lire ') + track.title">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">@if (playingTrack()?.id === track.id && isPlaying()) {<path d="M5 3h5v18H5zm9 0h5v18h-5z"/>} @else {<path d="m6 3 16 9-16 9z"/>}</svg>
+              </button>
+            </div>
+            <dl class="track-details">
+              <div class="file-detail"><dt>Nom de fichier</dt><dd>{{ track.originalName }}</dd></div>
+              <div><dt>Format</dt><dd>{{ formatType(track) }}</dd></div>
+              <div><dt>Taille</dt><dd>{{ formatSize(track.size) }}</dd></div>
+              <div><dt>Date d’ajout</dt><dd>{{ track.createdAt | date:'dd/MM/yyyy' }}</dd></div>
+            </dl>
+          </article>
+        } @empty {
+          <div class="empty-state">@if (loading()) {<p role="status">Chargement des pistes…</p>} @else if (!loadError()) {<h2>À vous de jouer.</h2><p>Importez votre première piste pour commencer la session.</p>}</div>
+        }
       </div>
       @if (loadError()) {<p class="error" role="alert">{{ loadError() }}</p>}
     </section>
@@ -41,7 +42,7 @@
       <form (submit)="$event.preventDefault(); upload()">
         <label for="track-title">Titre<input id="track-title" [formControl]="title" [readOnly]="uploading()" /></label>
         <div class="file-field"><label for="track-file">Fichier audio<input #audioInput id="track-file" type="file" accept=".mp3,.wav,.ogg,.m4a,audio/mpeg,audio/wav,audio/x-wav,audio/ogg,audio/mp4,audio/x-m4a" (change)="choose($event)" [disabled]="uploading()" aria-describedby="upload-hint" /></label><p id="upload-hint" class="hint">MP3, WAV, OGG ou M4A · 25 Mo max.</p></div>
-        <button class="primary import-button" type="submit" [disabled]="uploading() || !file || !!uploadError()">{{ uploading() ? 'Envoi en cours…' : 'Importer' }}</button>
+        <button class="primary import-button" type="submit" [disabled]="uploading() || !file || !!fileValidationError()">{{ uploading() ? 'Envoi en cours…' : 'Importer' }}</button>
       </form>
       @if (uploadError()) {<p class="error" role="alert">{{ uploadError() }}</p>}
       @if (uploadSuccess()) {<p class="success" role="status">{{ uploadSuccess() }}</p>}
