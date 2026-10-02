@@ -20,7 +20,7 @@
             <div class="track-heading">
               <span class="track-number" aria-hidden="true">{{ ((page() - 1) * 5 + i + 1).toString().padStart(2, '0') }}</span>
               <h2 class="track-title" [id]="'track-' + track.id">{{ track.title }}</h2>
-              <button type="button" class="play-button" [class.primary]="playingTrack()?.id === track.id" (click)="play(track)" [disabled]="audioLoading()" [attr.aria-label]="(playingTrack()?.id === track.id && isPlaying() ? 'Mettre en pause ' : 'Lire ') + track.title">
+              <button type="button" class="play-button" [class.primary]="playingTrack()?.id === track.id" (click)="play(track)" [disabled]="audioLoading() || deletingId() !== null" [attr.aria-label]="(playingTrack()?.id === track.id && isPlaying() ? 'Mettre en pause ' : 'Lire ') + track.title">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">@if (playingTrack()?.id === track.id && isPlaying()) {<path d="M5 3h5v18H5zm9 0h5v18h-5z"/>} @else {<path d="m6 3 16 9-16 9z"/>}</svg>
               </button>
             </div>
@@ -30,6 +30,9 @@
               <div><dt>Taille</dt><dd>{{ formatSize(track.size) }}</dd></div>
               <div><dt>Date d’ajout</dt><dd>{{ track.createdAt | date:'dd/MM/yyyy' }}</dd></div>
             </dl>
+            <button type="button" class="delete-button" (click)="deleteTrack(track)" [disabled]="deletingId() !== null || loading() || audioLoading()" [attr.aria-label]="'Supprimer ' + track.title">
+              {{ deletingId() === track.id ? 'Suppression en cours…' : 'Supprimer' }}
+            </button>
           </article>
         } @empty {
           <div class="empty-state">@if (loading()) {<p role="status">Chargement des pistes…</p>} @else if (!loadError()) {<h2>À vous de jouer.</h2><p>Importez votre première piste pour commencer la session.</p>}</div>
@@ -40,10 +43,16 @@
     <section class="upload" aria-labelledby="upload-heading">
       <h2 id="upload-heading">Importer une piste</h2>
       <form (submit)="$event.preventDefault(); upload()">
-        <label for="track-title">Titre<input id="track-title" [formControl]="title" [readOnly]="uploading()" /></label>
+        <label for="track-title">Titre<input id="track-title" [formControl]="title" /></label>
         <div class="file-field"><label for="track-file">Fichier audio<input #audioInput id="track-file" type="file" accept=".mp3,.wav,.ogg,.m4a,audio/mpeg,audio/wav,audio/x-wav,audio/ogg,audio/mp4,audio/x-m4a" (change)="choose($event)" [disabled]="uploading()" aria-describedby="upload-hint" /></label><p id="upload-hint" class="hint">MP3, WAV, OGG ou M4A · 25 Mo max.</p></div>
         <button class="primary import-button" type="submit" [disabled]="uploading() || !file || !!fileValidationError()">{{ uploading() ? 'Envoi en cours…' : 'Importer' }}</button>
       </form>
+      @if (uploading()) {
+        <div class="upload-progress">
+          <progress max="100" [attr.value]="uploadProgress()" aria-label="Progression de l’envoi"></progress>
+          <p role="status">{{ uploadProgress() === null ? 'Envoi en cours…' : uploadProgress() === 100 ? 'Envoi terminé · traitement par le serveur…' : 'Envoi : ' + uploadProgress() + ' %' }}</p>
+        </div>
+      }
       @if (uploadError()) {<p class="error" role="alert">{{ uploadError() }}</p>}
       @if (uploadSuccess()) {<p class="success" role="status">{{ uploadSuccess() }}</p>}
     </section>

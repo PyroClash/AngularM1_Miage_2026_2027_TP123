@@ -28,6 +28,7 @@ h1 { margin: 0; font-size: clamp(42px, 4.4vw, 76px); line-height: 1.2; white-spa
 .file-detail { grid-column: 1 / -1; }
 .track-details dt { color: var(--muted); font-size: 16px; }
 .track-details dd { margin: 3px 0 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.delete-button { margin-top: 20px; color: #ffa9ab; }
 .empty-state { grid-column: 1 / -1; padding: 50px 20px; text-align: center; }
 .empty-state h2 { margin-bottom: 12px; }
 .upload { margin: 16px 28px 0; padding: 18px 0 22px; border-top: 2px solid #afa0b9; }
@@ -40,6 +41,9 @@ input[type=file]::file-selector-button { color: var(--paper); background: transp
 .hint { font-size: 16px; color: var(--muted); margin: 5px 0 0; }
 .import-button { height: 48px; margin-top: 28px; font-size: 24px; }
 .upload .error, .upload .success { margin: 12px 0 0; }
+.upload-progress { margin-top: 12px; }
+.upload-progress progress { width: 100%; accent-color: var(--accent); }
+.upload-progress p { margin: 4px 0 0; }
 .transport { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; min-height: 116px; padding: 18px 28px; background: #09090b; border-top: 1px solid var(--line); }
 .transport-toggle { width: 62px; height: 62px; flex: none; }
 .transport-toggle svg { width: 26px; height: 26px; }
