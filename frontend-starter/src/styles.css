@@ -14,6 +14,8 @@
   --theme-muted: color-mix(in srgb, var(--accent) 22%, #aba79e);
   --theme-accent: var(--accent);
   --theme-bright: color-mix(in srgb, var(--accent) 55%, #fff6e6);
+  --control-hover: color-mix(in srgb, var(--accent) 8%, transparent);
+  --control-active: color-mix(in srgb, var(--accent) 14%, transparent);
   --ink: var(--theme-ink);
   --surface: var(--theme-surface);
   --line: var(--theme-border-low);
@@ -33,12 +35,9 @@ h1 { font-size: 3.5rem; letter-spacing: -.025em; }
 h2 { font-size: 2rem; }
 a { color: var(--accent); text-underline-offset: 5px; }
 button, input { font: inherit; }
-button { display: inline-flex; justify-content: center; align-items: center; gap: 10px; padding: 11px 18px; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--paper); cursor: pointer; transition: background 160ms, border-color 160ms, transform 160ms; font-weight: 600; }
-button:hover:enabled { border-color: var(--accent); background: var(--theme-raised); }
-button:active:enabled { transform: translateY(2px); }
+button { display: inline-flex; justify-content: center; align-items: center; gap: 10px; padding: 11px 18px; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--paper); cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease; font-weight: 600; }
 button:disabled { opacity: .45; cursor: default; }
 button.primary { background: var(--accent); color: var(--ink); border-color: var(--accent); }
-button.primary:hover:enabled { background: var(--theme-bright); }
 input { min-width: 0; color: var(--paper); background: var(--surface); border: 1px solid var(--theme-border); border-radius: 2px; padding: 11px 12px; caret-color: var(--accent); }
 input::placeholder { color: var(--muted); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
@@ -48,8 +47,13 @@ input::placeholder { color: var(--muted); }
 .card h1 { margin-bottom: 30px; }
 .card form, .card label { display: grid; gap: 8px; }
 .card label { margin-top: 12px; font-weight: 600; }
-.card form button { margin-top: 16px; background: var(--accent); color: var(--ink); }
+.card form button { margin-top: 16px; background: var(--accent); color: var(--ink); border-color: var(--accent); }
 .card p:last-child { margin-bottom: 0; }
 svg { width: 22px; height: 22px; flex: none; }
 body { font-size: 20px; }
-.card form button:hover { background: var(--theme-bright); }
+@media (hover: hover) and (pointer: fine) {
+  button:where(:hover:enabled) { border-color: var(--accent); background-color: var(--control-hover); }
+  button.primary:where(:hover:enabled), .card form button:where(:hover:enabled) { background-color: var(--theme-bright); border-color: var(--theme-bright); }
+}
+button:where(:active:enabled) { border-color: var(--accent); background-color: var(--control-active); }
+button.primary:where(:active:enabled), .card form button:where(:active:enabled) { background-color: var(--accent); border-color: var(--accent); }
