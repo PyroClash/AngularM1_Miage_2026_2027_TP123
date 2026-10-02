@@ -1,24 +1,45 @@
-@font-face { font-family: Anton; src: url('/fonts/Anton-Regular.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Rubik Dirt'; src: url('/fonts/RubikDirt-Regular.ttf') format('truetype'); font-display: swap; }
 @font-face { font-family: Barlow; src: url('/fonts/BarlowCondensed-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
 @font-face { font-family: Barlow; src: url('/fonts/BarlowCondensed-SemiBold.ttf') format('truetype'); font-weight: 600 800; font-display: swap; }
-:root { color-scheme: dark; --ink: #121014; --paper: #eee9e2; --accent: #ba8cd8; --muted: #bdb5c4; --line: #49404f; --surface: #1d1922; font-family: Barlow, sans-serif; color: var(--paper); background: var(--ink); font-size: 18px; }
+:root {
+  color-scheme: dark;
+  --accent: #70bded;
+  --paper: #eee9e2;
+  --theme-black: color-mix(in srgb, var(--accent) 3%, #070707);
+  --theme-ink: color-mix(in srgb, var(--accent) 4%, #0d0d0d);
+  --theme-surface: color-mix(in srgb, var(--accent) 7%, #151515);
+  --theme-raised: color-mix(in srgb, var(--accent) 14%, #202020);
+  --theme-border-low: color-mix(in srgb, var(--accent) 25%, #292929);
+  --theme-border: color-mix(in srgb, var(--accent) 48%, #414141);
+  --theme-muted: color-mix(in srgb, var(--accent) 22%, #aba79e);
+  --theme-accent: var(--accent);
+  --theme-bright: color-mix(in srgb, var(--accent) 55%, #fff6e6);
+  --ink: var(--theme-ink);
+  --surface: var(--theme-surface);
+  --line: var(--theme-border-low);
+  --muted: var(--theme-muted);
+  font-family: Barlow, sans-serif;
+  color: var(--paper);
+  background: var(--ink);
+  font-size: 18px;
+}
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; }
 ::selection { background: var(--accent); color: var(--ink); }
-* { scrollbar-color: #8050aa var(--ink); scrollbar-width: thin; }
+* { scrollbar-color: var(--theme-border) var(--ink); scrollbar-width: thin; }
 h1, h2, h3, p { margin-top: 0; }
-h1, h2 { font-family: Anton, sans-serif; font-weight: 400; text-wrap: balance; }
+h1, h2 { font-family: 'Rubik Dirt', sans-serif; font-weight: 400; text-wrap: balance; }
 h1 { font-size: 3.5rem; letter-spacing: -.025em; }
 h2 { font-size: 2rem; }
 a { color: var(--accent); text-underline-offset: 5px; }
 button, input { font: inherit; }
 button { display: inline-flex; justify-content: center; align-items: center; gap: 10px; padding: 11px 18px; border: 1px solid var(--line); border-radius: 2px; background: transparent; color: var(--paper); cursor: pointer; transition: background 160ms, border-color 160ms, transform 160ms; font-weight: 600; }
-button:hover:enabled { border-color: var(--accent); background: #2e2336; }
+button:hover:enabled { border-color: var(--accent); background: var(--theme-raised); }
 button:active:enabled { transform: translateY(2px); }
 button:disabled { opacity: .45; cursor: default; }
 button.primary { background: var(--accent); color: var(--ink); border-color: var(--accent); }
-button.primary:hover:enabled { background: #d2abe9; }
-input { min-width: 0; color: var(--paper); background: var(--surface); border: 1px solid #84758e; border-radius: 2px; padding: 11px 12px; caret-color: var(--accent); }
+button.primary:hover:enabled { background: var(--theme-bright); }
+input { min-width: 0; color: var(--paper); background: var(--surface); border: 1px solid var(--theme-border); border-radius: 2px; padding: 11px 12px; caret-color: var(--accent); }
 input::placeholder { color: var(--muted); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .error { color: #ffa9ab; }
@@ -31,4 +52,4 @@ input::placeholder { color: var(--muted); }
 .card p:last-child { margin-bottom: 0; }
 svg { width: 22px; height: 22px; flex: none; }
 body { font-size: 20px; }
-.card form button:hover { background: #d2abe9; }
+.card form button:hover { background: var(--theme-bright); }

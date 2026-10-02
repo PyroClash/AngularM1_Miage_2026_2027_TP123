@@ -1,5 +1,5 @@
 import {
-  AdditiveBlending, BufferAttribute, BufferGeometry, DynamicDrawUsage, Group,
+  AdditiveBlending, BufferAttribute, BufferGeometry, Color, DynamicDrawUsage, Group,
   Line, LineBasicMaterial, Points, ShaderMaterial,
 } from 'three';
 
@@ -14,7 +14,7 @@ export class GuitarAtmosphere {
       const geometry = new BufferGeometry();
       geometry.setAttribute('position', new BufferAttribute(new Float32Array(128 * 3), 3).setUsage(DynamicDrawUsage));
       const material = new LineBasicMaterial({
-        color: i % 2 ? 0xbda0ff : 0xf3a0df, transparent: true, opacity: 0,
+        color: 0x70bded, transparent: true, opacity: 0,
         blending: AdditiveBlending, depthWrite: false,
       });
       const line = new Line(geometry, material);
@@ -33,7 +33,8 @@ export class GuitarAtmosphere {
     geometry.setAttribute('position', new BufferAttribute(positions, 3));
     const material = new ShaderMaterial({
       transparent: true, depthWrite: false, blending: AdditiveBlending,
-      uniforms: { time: { value: 0 }, energy: { value: 0 }, treble: { value: 0 }, pixelRatio: { value: Math.min(window.devicePixelRatio, 1.5) } },
+      uniforms: { time: { value: 0 }, energy: { value: 0 }, treble: { value: 0 }, pixelRatio: { value: Math.min(window.devicePixelRatio, 1.5) },
+        tint: { value: new Color(0x70bded) }, highlight: { value: new Color(0x70bded).lerp(new Color(0xffffff), .5) } },
       vertexShader: `
         uniform float time, energy, treble, pixelRatio;
         varying float sparkle;
@@ -47,10 +48,11 @@ export class GuitarAtmosphere {
         }`,
       fragmentShader: `
         uniform float energy, treble;
+        uniform vec3 tint, highlight;
         varying float sparkle;
         void main() {
           float glow = 1. - smoothstep(.05, .5, length(gl_PointCoord - .5));
-          gl_FragColor = vec4(mix(vec3(.64,.46,1.), vec3(1.,.8,.93), sparkle),
+          gl_FragColor = vec4(mix(tint, highlight, sparkle),
             glow * (.035 + energy * .3 + sparkle * treble * .6));
         }`,
     });

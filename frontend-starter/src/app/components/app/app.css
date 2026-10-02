@@ -1,6 +1,6 @@
 :host { display: block; }
-.site-header { height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 0 32px; border-bottom: 1px solid var(--line); background: #09090b; }
-.brand { display: flex; align-items: center; gap: 18px; color: var(--paper); text-decoration: none; font-family: Anton, sans-serif; font-size: 32px; }
+.site-header { height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 0 32px; border-bottom: 1px solid var(--line); background: var(--theme-black); }
+.brand { display: flex; align-items: center; gap: 18px; color: var(--paper); text-decoration: none; font-family: 'Rubik Dirt', sans-serif; font-size: 32px; }
 .brand svg { width: 26px; height: 36px; color: var(--accent); transition: transform 220ms; }
 .brand:hover svg { transform: rotate(-8deg); }
 nav { display: flex; height: 100%; align-items: center; gap: 32px; }

@@ -2,6 +2,8 @@
 
 La composition reprend le C sombre de l’esquisse choisie : guitare à gauche, console audio en haut, pistes compactes et import repliable. Ouvrir [la bibliothèque locale](http://127.0.0.1:4200/tracks) après connexion.
 
+Le thème retenu utilise le bleu `#70bded` et la police Rubik Dirt pour les titres et la marque. Les commandes et les informations des pistes conservent Barlow. La police est servie localement avec sa licence OFL ; les couleurs du lecteur et les éclairages de la guitare suivent le bleu. Les variantes d’essai et leur sélecteur ont été retirés.
+
 ![Version finale sur ordinateur](session-desktop.jpg)
 
 [Version mobile, 390 px](session-mobile.jpg)
@@ -28,3 +30,5 @@ Les changements de titre, l’ouverture des détails et la pression des boutons 
 - Aucun fichier envoyé pendant cette inspection. Les données existantes sont conservées. Les captures montrent leurs titres réels.
 
 Les autres moteurs de navigateur et un téléphone physique n’ont pas été vérifiés.
+
+Le thème final a été inspecté à 1440 × 1000 et 390 × 844 : Rubik Dirt chargée, aucun débordement horizontal, lecture/pause et aller-retour Profil/Bibliothèque vérifiés. Les captures ont été renouvelées. La compilation et les neuf tests existants réussissent ; les requêtes de la police, du modèle et des pistes répondent avec succès. L’avertissement de proportions de l’image de secours et la réponse 404 de `favicon.ico` restent présents.

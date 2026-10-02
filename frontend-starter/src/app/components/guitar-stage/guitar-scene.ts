@@ -13,8 +13,9 @@ export class GuitarScene {
   private readonly world = new Scene();
   private readonly camera = new OrthographicCamera(-3, 3, 3.6, -3.6, .1, 40);
   private readonly pivot = new Group();
-  private readonly rim = new DirectionalLight(0xc39aea, 4);
-  private readonly accent = new DirectionalLight(0xe99cdb, 0);
+  private readonly rim = new DirectionalLight(0x70bded, 4);
+  private readonly accent = new DirectionalLight(0x70bded, 0);
+  private readonly rimTone = this.rim.color.getHSL({ h: 0, s: 0, l: 0 });
   private readonly atmosphere = new GuitarAtmosphere();
   private readonly environment;
   private readonly resizeObserver: ResizeObserver;
@@ -59,9 +60,9 @@ export class GuitarScene {
     room.dispose();
     pmrem.dispose();
     this.rim.position.set(-3, 1, -2);
-    const key = new DirectionalLight(0xe7e4ff, 2);
+    const key = new DirectionalLight(0xfff6e6, 2);
     key.position.set(2, 4, 5);
-    const fill = new DirectionalLight(0xb18bdd, .8);
+    const fill = new DirectionalLight(0x70bded, .8);
     fill.position.set(-4, -1, 3);
     this.accent.position.set(3, -2, 3);
     this.world.add(this.pivot, this.rim, this.accent, this.atmosphere.group, key, fill);
@@ -159,7 +160,7 @@ export class GuitarScene {
     this.pivot.position.y = Math.sin(this.time * .8) * (.055 + energy * .09) + this.pulse * .055;
     this.pivot.scale.setScalar(1 + this.bass * .018 + this.pulse * .014);
     this.rim.intensity = 4 + this.bass * 5 + this.pulse * 3;
-    this.rim.color.setHSL(.735 + this.mid * .055, .58, .77);
+    this.rim.color.setHSL(this.rimTone.h + this.mid * .055, this.rimTone.s, this.rimTone.l);
     this.accent.intensity = this.mid * 3 + this.treble * 2;
     this.atmosphere.update(this.time, this.bass, this.mid, this.treble, this.pulse);
     this.host.style.setProperty('--music-energy', energy.toFixed(3));

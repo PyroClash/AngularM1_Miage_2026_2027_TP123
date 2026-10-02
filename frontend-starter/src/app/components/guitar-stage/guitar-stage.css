@@ -1,10 +1,10 @@
 :host { display: block; position: absolute; inset: 0; }
 .stage { position: absolute; inset: 0; isolation: isolate; overflow: hidden; }
-.halo { position: absolute; inset: 4% -20% 5% -35%; background: radial-gradient(ellipse at 38% 46%, #9860c455, #55397120 44%, transparent 69%); transform: scale(calc(1 + var(--music-energy, 0) * .22)); opacity: calc(.65 + var(--music-energy, 0) * .65); }
-.stage::before { content: ''; position: absolute; inset: 0; background: linear-gradient(124deg, #c5a3e011, transparent 39%); }
+.halo { position: absolute; inset: 4% -20% 5% -35%; background: radial-gradient(ellipse at 38% 46%, color-mix(in srgb, var(--theme-muted) 33.33%, transparent), color-mix(in srgb, var(--theme-border-low) 12.55%, transparent) 44%, transparent 69%); transform: scale(calc(1 + var(--music-energy, 0) * .22)); opacity: calc(.65 + var(--music-energy, 0) * .65); }
+.stage::before { content: ''; position: absolute; inset: 0; background: linear-gradient(124deg, color-mix(in srgb, var(--theme-accent) 6.67%, transparent), transparent 39%); }
 .still { position: absolute; width: 100%; height: 94%; top: 3%; object-fit: contain; transform: rotate(11deg) scale(.94); transition: opacity 500ms; }
 .is-ready .still { opacity: 0; }
-.ground { position: absolute; width: 65%; height: 7%; bottom: 4%; left: 12%; background: radial-gradient(ellipse, #bb8ad525, transparent 65%); filter: blur(12px); z-index: -1; }
+.ground { position: absolute; width: 65%; height: 7%; bottom: 4%; left: 12%; background: radial-gradient(ellipse, color-mix(in srgb, var(--theme-muted) 14.51%, transparent), transparent 65%); filter: blur(12px); z-index: -1; }
 @media (max-width: 760px) {
   .still { height: 155%; width: 75%; left: 31%; top: -31%; transform: rotate(26deg); }
   .halo { inset: -40% -10%; }
