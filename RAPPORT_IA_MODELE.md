@@ -1,4 +1,4 @@
-# Rapport d'usage de l'IA — TP1 et TP2
+# Rapport d'usage de l'IA — TP1, TP2 et TP3
 
 ## Mission 0 — Cartographie de l'application
 
@@ -38,3 +38,31 @@ Captures : [page 1](livrable/tp2/captures/pagination-page-1.png), [page 2](livra
 - Vérifications dans Chrome : lecture audio authentifiée `200` et progression du lecteur ; format invalide bloqué avant l’envoi ; refus réel `400` du serveur affiché dans l’interface. Nouvel envoi possible après erreur sans resélection du fichier ; accès à la piste refusé au deuxième compte (`404`) ; cards sans débordement à 320, 390, 768 et 1 440 px.
 - Preuves : [relevé HTTP](livrable/tp2/preuves-reseau.md), [démonstration de lecture](livrable/tp2/demonstration-lecture.md) et [explications techniques](livrable/tp2/explications-techniques.md).
 - Captures de l’upload : [Headers — POST /api/tracks, statut 201 et multipart/form-data](livrable/tp2/captures/network-api-upload-headers.png) et [Payload — champs audio et title](livrable/tp2/captures/network-api-upload-payload.png).
+
+## Mission 5 — Suppression d’une piste
+
+- Modèle : GPT-6.
+- Aide apportée : analyse de la suppression existante, intégration du bouton dans les détails de la card et ajout d’une icône de corbeille discrète.
+- Fichiers concernés : `tracks-page.ts`, `tracks-page.html`, `tracks-page.css`, `track.service.ts` et `tracks-page.spec.ts`.
+- Notions expliquées : appel de `TrackService.delete()` depuis le composant, confirmation, blocage des doubles clics, SnackBar et rechargement de la liste. Le guard et l’interface peuvent être contournés ; le backend vérifie le JWT et recherche la piste avec son propriétaire avant de la supprimer.
+- Vérifications : test HTTP de suppression réussi, bouton désactivé pendant la requête et liste actualisée après une réponse `204`. Les captures réalisées dans Chrome montrent le `DELETE` avec le statut `204`, puis le rechargement de la page 2 avec un `GET` de statut `200`.
+- Preuves : [suppression — DELETE, statut 204](livrable/tp3/captures/network-suppression.png), [rechargement de la liste](livrable/tp3/captures/network-rechargement-apres-suppression.png) et [rapport des tests](livrable/tp3/rapport-tests.md).
+
+## Mission 6 — Progression de l’upload
+
+- Modèle : GPT-6.
+- Aide apportée : analyse du traitement des événements HTTP et de la gestion des contrôles pendant l’envoi ; indications pour réaliser les captures de progression et Network.
+- Fichiers concernés : `main.ts`, `track.service.ts`, `tracks-page.ts`, `tracks-page.html`, `tracks-page.css` et `tracks-page.spec.ts`.
+- Notions expliquées : `withXhr()`, `observe: 'events'`, `reportProgress: true` et distinction entre `UploadProgress` et la réponse finale. Le pourcentage est calculé par `Math.round(100 * loaded / total)` ; atteindre 100 % ne signifie pas encore que le serveur a enregistré la piste.
+- Vérifications : la capture fournie montre l’envoi de `song1.mp3` à 56 % avec le bouton désactivé ; la capture Network montre `POST /api/tracks` avec le statut `201`. Le test simule une progression à 25 %, puis une erreur `500` : le message apparaît, les contrôles sont réactivés et le fichier reste disponible pour réessayer.
+- Preuves : [progression de l’upload](livrable/tp3/captures/upload-progression.png), [upload — POST, statut 201](livrable/tp3/captures/network-upload.png) et [rapport des tests](livrable/tp3/rapport-tests.md).
+
+## Mission 7 — Tests automatisés
+
+- Modèle : GPT-6.
+- Aide apportée : écriture et explication de trois tests ciblés sur la pagination HTTP, la suppression avec rechargement et la progression d’upload avec gestion d’erreur ; réduction de la suite frontend à ces trois tests et rédaction du rapport des résultats.
+- Fichiers concernés : `track.service.spec.ts`, `tracks-page.spec.ts` et `livrable/tp3/rapport-tests.md`.
+- Notions expliquées : `TestBed`, `provideHttpClientTesting()`, `HttpTestingController`, `expectOne()`, `flush()`, `event()` et assertions sur les URL, méthodes, paramètres, headers et résultats affichés. Les réponses simulées permettent de tester sans backend ni MongoDB.
+- Vérifications : `npm test` réussit avec trois tests frontend et deux tests backend existants ; `npm run build` réussit. Les captures du navigateur ont été réalisées par l’étudiant, puis renommées et intégrées au rapport.
+- Preuve : [rapport des tests et captures TP3](livrable/tp3/rapport-tests.md).
+- Console : la capture fournie montre uniquement le message de développement d’Angular ; aucune erreur ni donnée sensible n’est visible au moment de la capture. [Preuve](livrable/tp3/captures/console-sans-erreur.png).

@@ -26,4 +26,20 @@ La pagination est testée dans [track.service.spec.ts](../../frontend-starter/sr
 
 `provideHttpClientTesting()` remplace le transport réseau. `expectOne()` contrôle la requête, `flush()` simule la réponse et `event()` simule la progression. `fixture.detectChanges()` actualise le template pour vérifier les messages et les boutons.
 
-Les tests utilisent le vrai `TrackService` et, pour les requêtes de suppression et d’upload, le vrai intercepteur avec un token fictif. Ils fonctionnent sans backend ni MongoDB. Les captures et vérifications Network réelles restent à effectuer.
+Les tests utilisent le vrai `TrackService` et, pour les requêtes de suppression et d’upload, le vrai intercepteur avec un token fictif. Ils fonctionnent sans backend ni MongoDB.
+
+## Captures de l’upload et de la suppression
+
+![Upload en cours à 56 %](captures/upload-progression.png)
+
+![POST /api/tracks — 201 Created](captures/network-upload.png)
+
+![DELETE /api/tracks/:id — 204 No Content](captures/network-suppression.png)
+
+![Rechargement de la page 2 — GET /api/tracks?page=2&limit=5, 200 OK](captures/network-rechargement-apres-suppression.png)
+
+## Console
+
+La capture montre uniquement le message normal « Angular is running in development mode. ». Aucune erreur ni donnée sensible n’est visible au moment de la capture.
+
+![Console sans erreur visible](captures/console-sans-erreur.png)
