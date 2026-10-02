@@ -3,7 +3,7 @@
     <div class="poster-scene">
       <app-guitar-stage />
       <p class="poster-label">MA BIBLIOTHÈQUE <span></span></p>
-      <div class="poster-signature" aria-hidden="true"><span class="signature-line"></span><span>GUITAR PRACTICE CLOUD</span><span class="signature-mark">✦</span></div>
+      <div class="poster-signature" aria-hidden="true"><span class="signature-line"></span><span>GUITAR PRACTICE CLOUD</span></div>
     </div>
   </aside>
 
@@ -66,21 +66,26 @@
       <div class="track-list">
         @for (track of tracks(); track track.id; let i = $index) {
           <article class="track-card" [class.selected]="featuredTrack()?.id === track.id" [class.track-playing]="playingTrack()?.id === track.id && isPlaying()" [class.pending]="pendingTrack()?.id === track.id" [attr.aria-labelledby]="'track-' + track.id">
-            <div class="track-row">
+            <div class="track-row" (click)="play(track)" [class.playback-disabled]="pendingTrack()?.id === track.id || deletingId() !== null">
               <span class="track-number" aria-hidden="true">@if (playingTrack()?.id === track.id && isPlaying()) {<span class="equalizer"><i></i><i></i><i></i><i></i></span>} @else { {{ ((page() - 1) * 5 + i + 1).toString().padStart(2, '0') }} }</span>
               <h3 class="track-title" [id]="'track-' + track.id">{{ track.title }}</h3>
               <span class="track-format">{{ formatType(track) }}</span>
-              <button type="button" class="track-play" (click)="play(track)" [disabled]="pendingTrack()?.id === track.id || deletingId() !== null" [attr.aria-label]="(pendingTrack()?.id === track.id ? 'Chargement de ' : playingTrack()?.id === track.id && isPlaying() ? 'Mettre en pause ' : 'Lire ') + track.title">
+              <button type="button" class="track-play" (click)="$event.stopPropagation(); play(track)" [disabled]="pendingTrack()?.id === track.id || deletingId() !== null" [attr.aria-label]="(pendingTrack()?.id === track.id ? 'Chargement de ' : playingTrack()?.id === track.id && isPlaying() ? 'Mettre en pause ' : 'Lire ') + track.title">
                 @if (pendingTrack()?.id === track.id) {<span class="loader" aria-hidden="true"></span>} @else {<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">@if (playingTrack()?.id === track.id && isPlaying()) {<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>} @else {<path d="m8 5 11 7-11 7z"/>}</svg>}
               </button>
             </div>
             <details class="track-details">
-              <summary [attr.aria-label]="'Détails de ' + track.title"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></summary>
+              <summary [attr.aria-label]="'Détails et actions de ' + track.title" title="Détails et actions"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></summary>
               <dl><div><dt>Fichier original</dt><dd>{{ track.originalName }}</dd></div><div><dt>Taille</dt><dd>{{ formatSize(track.size) }}</dd></div><div><dt>Ajouté le</dt><dd>{{ track.createdAt | date:'dd/MM/yyyy' }}</dd></div></dl>
+              <div class="track-detail-actions">
+                <button type="button" class="delete-button" (click)="deleteTrack(track)" [disabled]="deletingId() !== null || loading() || audioLoading()" [attr.aria-label]="(deletingId() === track.id ? 'Suppression en cours de ' : 'Supprimer ') + track.title">
+                  @if (deletingId() === track.id) {<span class="loader" aria-hidden="true"></span>} @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>
+                  }
+                  {{ deletingId() === track.id ? 'Suppression en cours…' : 'Supprimer' }}
+                </button>
+              </div>
             </details>
-            <button type="button" class="delete-button" (click)="deleteTrack(track)" [disabled]="deletingId() !== null || loading() || audioLoading()" [attr.aria-label]="'Supprimer ' + track.title">
-              {{ deletingId() === track.id ? 'Suppression en cours…' : 'Supprimer' }}
-            </button>
           </article>
         } @empty {
           <div class="empty-state">@if (loading()) {<span class="loader" aria-hidden="true"></span><p role="status">Chargement des pistes…</p>} @else if (!loadError()) {<h3>Votre bibliothèque commence ici.</h3><p>Ajoutez un fichier audio avec « Importer une piste ».</p>}</div>
