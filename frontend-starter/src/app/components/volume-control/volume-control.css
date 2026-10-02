@@ -1,0 +1,41 @@
+:host { display: block; min-width: 0; }
+.volume-control { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #c4b5cf; }
+.volume-label { font-size: 10px; font-weight: 600; letter-spacing: .16em; line-height: 1; }
+.volume-dial { position: relative; width: 78px; height: 78px; flex: none; border-radius: 50%; touch-action: none; }
+.dial-scale { position: absolute; inset: -2px; border-radius: 50%; background: conic-gradient(from 225deg, #c3a0e5 var(--volume-sweep), #695675 var(--volume-sweep) 270deg, transparent 270deg); mask: radial-gradient(circle, transparent 67%, #000 68% 71%, transparent 72%); opacity: .85; }
+.dial-body { position: absolute; inset: 5px; border: 1px solid #977ca8; border-radius: 50%; background: linear-gradient(145deg, #b699c6, #35253d 30%, #0a080e 60%, #89639d); box-shadow: 0 5px 9px #0008, inset 0 0 0 3px #17101e; }
+.dial-face { position: absolute; inset: 5px; border-radius: 50%; border: 1px solid #82758c; background: repeating-conic-gradient(from 10deg, #ffffff0a 0deg 1deg, transparent 1deg 4deg), conic-gradient(#28242f, #65576f 44deg, #25212b 95deg, #4e425a 170deg, #1a171e 225deg, #776880 290deg, #28242f); box-shadow: inset 0 0 0 2px #25212b, inset 0 2px 4px #ffffff2b; }
+.dial-indicator { position: absolute; inset: 3px; border-radius: 50%; transform: rotate(var(--volume-angle)); }
+.dial-indicator::before { content: ''; position: absolute; top: 1px; left: calc(50% - 1px); width: 2px; height: 12px; border-radius: 2px; background: #f2dfff; box-shadow: 0 0 5px #dec0ff80; }
+.dial-input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: grab; touch-action: none; }
+.volume-dial:has(.dial-input:focus-visible) { outline: 2px solid #d9b8fa; outline-offset: 5px; }
+.dragging .dial-face { filter: brightness(1.16); }
+.dragging .dial-input { cursor: grabbing; }
+.volume-readout { display: flex; align-items: center; justify-content: center; height: 24px; gap: 1px; }
+.mute-button { display: grid; place-items: center; width: 32px; height: 32px; padding: 7px; border: 0; border-radius: 50%; background: transparent; color: #bba9c8; cursor: pointer; transition: color 150ms ease, background 150ms ease; }
+.mute-button svg { width: 17px; height: 17px; }
+@media (hover: hover) and (pointer: fine) {
+  .volume-dial:hover .dial-face { filter: brightness(1.16); }
+  .mute-button:hover:enabled { color: #f3e3ff; background: #d4a3ff15; }
+}
+.mute-button:focus-visible { outline: 2px solid #d9b8fa; outline-offset: 2px; }
+.volume-percentage { min-width: 34px; font-size: 12px; font-variant-numeric: tabular-nums; color: #d5c3e0; }
+.volume-percentage > span { margin-left: 2px; font-size: 10px; color: #ae99bc; }
+.muted .dial-indicator::before { background: #a290ae; box-shadow: none; }
+.muted .mute-button { color: #e7b9f6; }
+@media (max-width: 1200px) { .volume-dial { width: 68px; height: 68px; } }
+@media (max-width: 680px) {
+  .volume-control { gap: 5px; }
+  .volume-label { font-size: 9px; }
+  .volume-dial { width: 56px; height: 56px; }
+  .dial-body { inset: 4px; }
+  .dial-face { inset: 4px; }
+  .dial-indicator { inset: 2px; }
+  .dial-indicator::before { height: 9px; }
+  .mute-button { width: 36px; height: 36px; }
+}
+@media (hover: none), (pointer: coarse) { .mute-button:hover:enabled { background: transparent; } }
+@media (prefers-reduced-motion: reduce) {
+  .mute-button { transition: none; }
+  .mute-button:active:enabled { transform: none; }
+}

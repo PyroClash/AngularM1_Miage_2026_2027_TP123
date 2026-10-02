@@ -1,0 +1,22 @@
+<div class="volume-control" [class.dragging]="dragging()" [class.muted]="level() === 0">
+  <span class="volume-label">VOLUME</span>
+  <div class="volume-dial" [style.--volume-angle]="angle()" [style.--volume-sweep]="sweep()">
+    <span class="dial-scale" aria-hidden="true"></span>
+    <span class="dial-body" aria-hidden="true"><span class="dial-face"><span class="dial-indicator"></span></span></span>
+    <input class="dial-input" type="range" min="0" max="1" step="0.01" [value]="level()"
+      aria-label="Volume" [attr.aria-valuetext]="percentage() + ' %'" title="Glissez pour régler le volume"
+      (input)="onInput($event)" (pointerdown)="startDrag($event)" (pointermove)="moveDrag($event)"
+      (pointerup)="endDrag($event)" (pointercancel)="endDrag($event)" (lostpointercapture)="endDrag($event)" />
+  </div>
+  <div class="volume-readout">
+    <button class="mute-button" type="button" [attr.aria-label]="level() === 0 ? 'Rétablir le son' : 'Couper le son'"
+      [attr.title]="level() === 0 ? 'Rétablir le son' : 'Couper le son'" [attr.aria-pressed]="level() === 0" (click)="toggleMute()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+        @if (level() === 0) { <path d="m16 9 5 6m0-6-5 6" /> }
+        @else { <path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" /> }
+      </svg>
+    </button>
+    <span class="volume-percentage" aria-hidden="true">{{ percentage() }}<span>%</span></span>
+  </div>
+</div>

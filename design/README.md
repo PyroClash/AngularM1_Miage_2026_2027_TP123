@@ -2,9 +2,9 @@
 
 Guitare originale créée dans Blender pour la bibliothèque de Guitar Practice Cloud.
 
-![Bibliothèque sur ordinateur](previews/guitar-desktop.png)
+![Bibliothèque sur ordinateur](session/session-desktop.jpg)
 
-[Vue mobile](previews/guitar-mobile.png)
+[Vue mobile](session/session-mobile.jpg) · [Design de la bibliothèque](session/README.md)
 
 ## Sources
 
@@ -17,7 +17,7 @@ Guitare originale créée dans Blender pour la bibliothèque de Guitar Practice 
 
 Perspective au déplacement du pointeur et flottement permanent. Pendant la lecture, l’analyse réelle du son pilote trois effets : les basses font pulser l’éclairage et la guitare ; les médiums déforment six filaments lumineux et accentuent le balancement ; les aigus font scintiller les particules. Les attaques de basses ajoutent une impulsion brève. À l’arrêt du son, ces effets reviennent progressivement au flottement de repos.
 
-Sur ordinateur, la guitare occupe 24 % de la largeur de la page (21,33 % entre 761 et 1100 px). Sur mobile, elle apparaît dans un bandeau au-dessus de la bibliothèque.
+Sur ordinateur, la guitare occupe 26 % de la largeur de la page (23 % entre 761 et 1100 px). Sur mobile, elle apparaît dans un bandeau au-dessus de la bibliothèque.
 
 L’animation fonctionne sur ordinateur et mobile, sans bouton de suspension ni adaptation à `prefers-reduced-motion`. La boucle de rendu est plafonnée à 30 images/s et suspendue lorsque la scène est hors écran ou l’onglet masqué.
 

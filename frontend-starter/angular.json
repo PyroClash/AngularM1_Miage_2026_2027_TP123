@@ -8,6 +8,9 @@
             "architect": {
                 "build": {
                     "builder": "@angular/build:application",
+                    "configurations": {
+                        "development": { "optimization": false, "sourceMap": true, "extractLicenses": false }
+                    },
                     "options": {
                         "browser": "src/main.ts",
                         "tsConfig": "tsconfig.app.json",
@@ -27,7 +30,7 @@
                     "builder": "@angular/build:dev-server",
                     "configurations": {
                         "development": {
-                            "buildTarget": "gpc:build"
+                            "buildTarget": "gpc:build:development"
                         }
                     },
                     "defaultConfiguration": "development"

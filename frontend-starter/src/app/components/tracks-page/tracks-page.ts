@@ -1,13 +1,14 @@
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { Track } from '../../shared/models/track.model';
 import { TrackService } from '../../shared/services/track.service';
 import { PlaybackAnalysis } from '../../shared/services/playback-analysis.service';
 import { GuitarStageComponent } from '../guitar-stage/guitar-stage';
+import { VolumeControlComponent } from '../volume-control/volume-control';
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const AUDIO_TYPES = new Set([
@@ -28,7 +29,7 @@ function frenchPaginatorIntl(): MatPaginatorIntl {
 }
 
 @Component({
-  imports: [DatePipe, GuitarStageComponent, ReactiveFormsModule, MatPaginatorModule],
+  imports: [DatePipe, GuitarStageComponent, VolumeControlComponent, ReactiveFormsModule, MatPaginatorModule],
   providers: [PlaybackAnalysis, { provide: MatPaginatorIntl, useFactory: frenchPaginatorIntl }],
   templateUrl: './tracks-page.html',
   styleUrl: './tracks-page.css',
@@ -39,8 +40,10 @@ export class TracksPageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly audioInput = viewChild<ElementRef<HTMLInputElement>>('audioInput');
   private readonly player = viewChild<ElementRef<HTMLAudioElement>>('player');
+  private readonly paginator = viewChild(MatPaginator);
   private listRequest = 0;
   private audioRequest = 0;
+  private autoplayPending = false;
 
   readonly tracks = signal<Track[]>([]);
   readonly page = signal(1);
@@ -55,11 +58,20 @@ export class TracksPageComponent {
   readonly audioLoading = signal(false);
   readonly audioError = signal('');
   readonly playingTrack = signal<Track | null>(null);
+  readonly pendingTrack = signal<Track | null>(null);
   readonly audioUrl = signal('');
   readonly isPlaying = signal(false);
   readonly currentTime = signal(0);
   readonly duration = signal(0);
+  readonly ended = signal(false);
   readonly volume = signal(0.8);
+  readonly featuredTrack = computed<Track | null>(() => this.playingTrack() ?? this.pendingTrack() ?? this.tracks()[0] ?? null);
+  readonly featuredNumber = computed(() => {
+    const index = this.tracks().findIndex(track => track.id === this.featuredTrack()?.id);
+    return index < 0 ? null : ((this.page() - 1) * 5 + index + 1).toString().padStart(2, '0');
+  });
+  readonly progress = computed(() => this.duration() ? (this.currentTime() / this.duration()) * 100 : 0);
+  readonly playerStatus = computed(() => this.isPlaying() ? 'En lecture' : this.ended() ? 'Terminé' : this.playingTrack() ? 'En pause' : 'Prêt à jouer');
   readonly title = new FormControl('', { nonNullable: true });
   file?: File;
 
@@ -95,11 +107,11 @@ export class TracksPageComponent {
     return fallback;
   }
 
-  load(): void {
+  load(requestedPage = this.page()): void {
     const request = ++this.listRequest;
     this.loading.set(true);
     this.loadError.set('');
-    this.service.list(this.page(), 5).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.service.list(requestedPage, 5).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (request !== this.listRequest) return;
         this.tracks.set(response.items);
@@ -112,6 +124,8 @@ export class TracksPageComponent {
         if (request !== this.listRequest) return;
         console.error('[TracksPage] Chargement impossible', error);
         this.loadError.set(this.message(error, 'Impossible de charger les pistes. Réessayez.'));
+        const paginator = this.paginator();
+        if (paginator) paginator.pageIndex = this.page() - 1;
         this.loading.set(false);
       },
     });
@@ -119,8 +133,7 @@ export class TracksPageComponent {
 
   go(page: number): void {
     if (this.loading() || page < 1 || page > this.pages() || page === this.page()) return;
-    this.page.set(page);
-    this.load();
+    this.load(page);
   }
 
   upload(): void {
@@ -141,8 +154,7 @@ export class TracksPageComponent {
           this.file = undefined;
           const input = this.audioInput()?.nativeElement;
           if (input) input.value = '';
-          this.page.set(1);
-          this.load();
+          this.load(1);
         },
         error: (error) => {
           console.error('[TracksPage] Envoi impossible', error);
@@ -153,23 +165,33 @@ export class TracksPageComponent {
   }
 
   play(track: Track): void {
+    if (this.pendingTrack()?.id === track.id) return;
     this.analysis.prepare();
     if (this.playingTrack()?.id === track.id && this.audioUrl()) {
+      ++this.audioRequest;
+      this.pendingTrack.set(null);
+      this.audioLoading.set(false);
       this.togglePlayback();
       return;
     }
     const request = ++this.audioRequest;
+    this.autoplayPending = false;
     this.audioLoading.set(true);
+    this.pendingTrack.set(track);
     this.audioError.set('');
     this.service.audio(track.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (blob) => {
         if (request !== this.audioRequest) return;
         const previousUrl = this.audioUrl();
+        this.player()?.nativeElement.pause();
         this.isPlaying.set(false);
+        this.ended.set(false);
         this.currentTime.set(0);
         this.duration.set(0);
         this.audioUrl.set(URL.createObjectURL(blob));
         this.playingTrack.set(track);
+        this.pendingTrack.set(null);
+        this.autoplayPending = true;
         this.audioLoading.set(false);
         if (previousUrl) URL.revokeObjectURL(previousUrl);
       },
@@ -177,6 +199,7 @@ export class TracksPageComponent {
         if (request !== this.audioRequest) return;
         console.error('[TracksPage] Lecture impossible', error);
         this.audioError.set(this.message(error, 'Impossible de charger ce morceau. Réessayez.'));
+        this.pendingTrack.set(null);
         this.audioLoading.set(false);
       },
     });
@@ -185,13 +208,42 @@ export class TracksPageComponent {
   togglePlayback(): void {
     const audio = this.player()?.nativeElement;
     if (!audio || !this.audioUrl()) return;
+    this.autoplayPending = false;
     if (audio.paused) {
       this.analysis.prepare();
       this.audioError.set('');
-      void audio.play().catch(() => this.audioError.set('Lecture impossible. Réessayez avec le bouton de lecture.'));
+      this.ended.set(false);
+      this.startAudio(audio);
     } else {
       audio.pause();
     }
+  }
+
+  playFeatured(): void {
+    const track = this.featuredTrack();
+    if (track) this.play(track);
+  }
+
+  onCanPlay(): void {
+    const audio = this.player()?.nativeElement;
+    if (!audio || !this.autoplayPending) return;
+    this.autoplayPending = false;
+    this.startAudio(audio);
+  }
+
+  private startAudio(audio: HTMLAudioElement): void {
+    const request = this.audioRequest;
+    void audio.play().catch(() => {
+      if (request !== this.audioRequest) return;
+      this.isPlaying.set(false);
+      this.audioError.set('Cliquez sur Lecture pour démarrer ce morceau.');
+    });
+  }
+
+  onAudioError(): void {
+    this.autoplayPending = false;
+    this.isPlaying.set(false);
+    this.audioError.set('Le navigateur ne peut pas lire ce fichier audio.');
   }
 
   seek(event: Event): void {
@@ -199,11 +251,8 @@ export class TracksPageComponent {
     if (audio && this.duration() > 0) {
       audio.currentTime = Number((event.target as HTMLInputElement).value);
       this.currentTime.set(audio.currentTime);
+      this.ended.set(false);
     }
-  }
-
-  setVolume(event: Event): void {
-    this.volume.set(Number((event.target as HTMLInputElement).value));
   }
 
   syncTime(audio: HTMLAudioElement): void {
