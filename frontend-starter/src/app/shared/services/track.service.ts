@@ -18,7 +18,14 @@ export class TrackService {
     const body = new FormData();
     body.append('audio', file);
     body.append('title', title);
-    return this.http.post<Track>('/api/tracks', body);
+    return this.http.post<Track>('/api/tracks', body, {
+      observe: 'events',
+      reportProgress: true,
+    });
+  }
+
+  delete(id: string) {
+    return this.http.delete<void>(`/api/tracks/${id}`);
   }
 
   audio(id: string) {
