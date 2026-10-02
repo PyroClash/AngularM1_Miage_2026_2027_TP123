@@ -1,11 +1,13 @@
-import { DatePipe, NgOptimizedImage } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { Track } from '../../shared/models/track.model';
 import { TrackService } from '../../shared/services/track.service';
+import { PlaybackAnalysis } from '../../shared/services/playback-analysis.service';
+import { GuitarStageComponent } from '../guitar-stage/guitar-stage';
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const AUDIO_TYPES = new Set([
@@ -26,13 +28,14 @@ function frenchPaginatorIntl(): MatPaginatorIntl {
 }
 
 @Component({
-  imports: [DatePipe, NgOptimizedImage, ReactiveFormsModule, MatPaginatorModule],
-  providers: [{ provide: MatPaginatorIntl, useFactory: frenchPaginatorIntl }],
+  imports: [DatePipe, GuitarStageComponent, ReactiveFormsModule, MatPaginatorModule],
+  providers: [PlaybackAnalysis, { provide: MatPaginatorIntl, useFactory: frenchPaginatorIntl }],
   templateUrl: './tracks-page.html',
   styleUrl: './tracks-page.css',
 })
 export class TracksPageComponent {
   private readonly service = inject(TrackService);
+  private readonly analysis = inject(PlaybackAnalysis);
   private readonly destroyRef = inject(DestroyRef);
   private readonly audioInput = viewChild<ElementRef<HTMLInputElement>>('audioInput');
   private readonly player = viewChild<ElementRef<HTMLAudioElement>>('player');
@@ -61,6 +64,7 @@ export class TracksPageComponent {
   file?: File;
 
   constructor() {
+    effect(() => this.analysis.attach(this.player()?.nativeElement));
     this.load();
     this.destroyRef.onDestroy(() => {
       const url = this.audioUrl();
@@ -149,6 +153,7 @@ export class TracksPageComponent {
   }
 
   play(track: Track): void {
+    this.analysis.prepare();
     if (this.playingTrack()?.id === track.id && this.audioUrl()) {
       this.togglePlayback();
       return;
@@ -181,6 +186,7 @@ export class TracksPageComponent {
     const audio = this.player()?.nativeElement;
     if (!audio || !this.audioUrl()) return;
     if (audio.paused) {
+      this.analysis.prepare();
       this.audioError.set('');
       void audio.play().catch(() => this.audioError.set('Lecture impossible. Réessayez avec le bouton de lecture.'));
     } else {
